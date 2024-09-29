@@ -70,8 +70,3 @@ This project automates the process of copying a Google Spreadsheet, updating spe
 ## .gitignore
 
 The [`.gitignore`](.gitignore) file includes common Python exclusions, as well as specific exclusions for Google API credentials, token files, and the [`spreadsheet_id.txt`](spreadsheet_id.txt) file. It also excludes the [`.env`](.env) file used for environment variables.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-

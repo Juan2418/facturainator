@@ -23,17 +23,12 @@ SCOPES = [
     "https://www.googleapis.com/auth/gmail.send",
 ]
 
-# The ID and range of a sample spreadsheet.
-
 SAMPLE_SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
 SAMPLE_RANGE_NAME = "A1:H25"
 SPREADSHEET_ID_FILE = "spreadsheet_id.txt"
 
 
 def main():
-    """Shows basic usage of the Sheets API.
-    Prints values from a sample spreadsheet.
-    """
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -59,8 +54,6 @@ def main():
 
         spreadsheet_id = get_or_create_spreadsheet_id(drive_service)
 
-
-        # Call the Sheets API
         sheet = service.spreadsheets()
         result = (
             sheet.values()
