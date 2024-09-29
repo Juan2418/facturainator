@@ -16,8 +16,8 @@ This project automates the process of copying a Google Spreadsheet, updating spe
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/yourusername/your-repo.git
-   cd your-repo
+   git clone https://github.com/Juan2418/facturainator
+   cd facturainator
    ```
 
 2. Create and activate a virtual environment:
