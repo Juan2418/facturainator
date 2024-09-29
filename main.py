@@ -1,16 +1,16 @@
-from datetime import datetime
-import os.path
 import base64
+import os.path
+from datetime import datetime
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
 
+from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email import encoders
-from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
@@ -51,7 +51,6 @@ def main():
         drive_service = build("drive", "v3", credentials=creds)
         gmail_service = build("gmail", "v1", credentials=creds)
 
-
         spreadsheet_id = get_or_create_spreadsheet_id(drive_service)
 
         sheet = service.spreadsheets()
@@ -75,6 +74,7 @@ def main():
     except HttpError as err:
         print(err)
 
+
 def get_or_create_spreadsheet_id(drive_service):
     """
     Retrieves or creates a new Google Spreadsheet ID.
@@ -90,7 +90,7 @@ def get_or_create_spreadsheet_id(drive_service):
         str: The new spreadsheet ID after creating a copy of the original spreadsheet.
     """
     if os.path.exists(SPREADSHEET_ID_FILE):
-        with open(SPREADSHEET_ID_FILE, 'r') as file:
+        with open(SPREADSHEET_ID_FILE, "r") as file:
             spreadsheet_id = file.read().strip()
             print(f"Using existing spreadsheet ID from file: {spreadsheet_id}")
     else:
@@ -99,10 +99,11 @@ def get_or_create_spreadsheet_id(drive_service):
 
     # Always create a copy of the spreadsheet
     new_spreadsheet_id = create_copy_of_spreadsheet(drive_service, spreadsheet_id)
-    with open(SPREADSHEET_ID_FILE, 'w') as file:
+    with open(SPREADSHEET_ID_FILE, "w") as file:
         file.write(new_spreadsheet_id)
     print(f"New spreadsheet ID saved: {new_spreadsheet_id}")
     return new_spreadsheet_id
+
 
 def send_email_with_attachment(gmail_service, pdf_file_path):
     """
@@ -127,26 +128,31 @@ def send_email_with_attachment(gmail_service, pdf_file_path):
         send_email_with_attachment(gmail_service, '/path/to/invoice.pdf')
     """
     message = MIMEMultipart()
-    recipient_email = os.getenv('EMAIL_RECIPIENTS', 'default_recipient@example.com')
-    cc_email = os.getenv('EMAIL_CC', 'default_cc@example.com')
-    message['to'] = recipient_email
-    message['cc'] = cc_email
-    message['subject'] = f'Invoice {datetime.now().strftime("%b %d, %Y")}'
+    recipient_email = os.getenv("EMAIL_RECIPIENTS", "default_recipient@example.com")
+    cc_email = os.getenv("EMAIL_CC", "default_cc@example.com")
+    message["to"] = recipient_email
+    message["cc"] = cc_email
+    message["subject"] = f'Invoice {datetime.now().strftime("%b %d, %Y")}'
 
     # Attach the PDF file
-    with open(pdf_file_path, 'rb') as pdf_file:
-        mime_base = MIMEBase('application', 'pdf')
+    with open(pdf_file_path, "rb") as pdf_file:
+        mime_base = MIMEBase("application", "pdf")
         mime_base.set_payload(pdf_file.read())
         encoders.encode_base64(mime_base)
-        mime_base.add_header('Content-Disposition', 'attachment', filename=os.path.basename(pdf_file_path))
+        mime_base.add_header(
+            "Content-Disposition",
+            "attachment",
+            filename=os.path.basename(pdf_file_path),
+        )
         message.attach(mime_base)
 
     raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-    message_body = {
-        'raw': raw_message
-    }
-    sent_message = gmail_service.users().messages().send(userId='me', body=message_body).execute()
+    message_body = {"raw": raw_message}
+    sent_message = (
+        gmail_service.users().messages().send(userId="me", body=message_body).execute()
+    )
     print(f"Email sent with ID: {sent_message['id']}")
+
 
 def download_pdf(drive_service, spreadsheet_id):
     """
@@ -184,7 +190,7 @@ def create_copy_of_spreadsheet(drive_service, spreadsheet_id):
     Raises:
         googleapiclient.errors.HttpError: If an error occurs during the copy operation.
     """
-    
+
     copy_title = f"Invoice {datetime.now().strftime('%b-%d-%Y')}"
     copy_sheet = {"name": copy_title}
     copied_file = (
@@ -196,7 +202,7 @@ def create_copy_of_spreadsheet(drive_service, spreadsheet_id):
 
 
 def update_invoice_total(sheet, spreadsheet_id):
-    salary = os.getenv('SALARY', '0')
+    salary = os.getenv("SALARY", "0")
     update_cell(sheet, spreadsheet_id, "F19", salary)
 
 
